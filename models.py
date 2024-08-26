@@ -10,6 +10,7 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     password = Column(String)
     uuid = Column(String)
+    username = Column(String)
 
 class Post(Base):
     __tablename__ = "posts"
