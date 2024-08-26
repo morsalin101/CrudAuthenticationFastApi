@@ -8,3 +8,8 @@ class PostCreate(BaseModel):
     description: str
     uuid:Optional[str] = None 
 
+
+class PostUpdate(BaseModel):
+    title: str
+    description: str    
+
