@@ -1,17 +1,14 @@
+# app/main.py
+
 from fastapi import FastAPI
-from routes import user_route,crud_route  # Import your routers
-from database import engine, Base
-from sqlalchemy.orm import Session
-from database import SessionLocal
-import models
+from app.routes import crud_route, user_route  # Correct import path
+from app.database import engine, Base
 
+# Create the database tables
 Base.metadata.create_all(bind=engine)
-
 
 app = FastAPI()
 
-# Include your routers
-app.include_router(user_route.router,tags=["Users"])
-app.include_router(crud_route.router,tags=["Crud"])
-
-
+# Include the routers
+app.include_router(crud_route.router,tags=["crud"])
+app.include_router(user_route.router,tags=["user"])

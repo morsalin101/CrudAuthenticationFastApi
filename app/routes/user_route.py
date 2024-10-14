@@ -1,13 +1,13 @@
 from fastapi import APIRouter,Depends,status
-from database import get_db
+from app import database
 from sqlalchemy.orm import Session
 from fastapi import Depends,HTTPException
-import schemas.user_schemas 
-import models
-import helper  
+from  app.schemas import user_schemas 
+from app import models
+from app import helper  
 from fastapi.security import OAuth2PasswordRequestForm
-from auth import create_access_token
-from helper import authenticate_user
+from app.auth import create_access_token
+from app.helper import authenticate_user
 
 router = APIRouter(
     prefix="/auth"
@@ -18,7 +18,7 @@ router = APIRouter(
 
 
 @router.post("/signup")
-def create_user(db: Session = Depends(get_db),user: schemas.user_schemas .UserCreate = Depends()):
+def create_user(db: Session = Depends(database.get_db),user:user_schemas .UserCreate = Depends()):
     existing_user = db.query(models.User).filter_by(email=user.email).first()
     if existing_user:
             raise HTTPException(status_code=400, detail="Email already registered")
@@ -32,8 +32,8 @@ def create_user(db: Session = Depends(get_db),user: schemas.user_schemas .UserCr
     return {"message":"user created successfully"}
 
 
-@router.post("/login", response_model=schemas.user_schemas.Token)
-def login_for_access_token(form_data:schemas.user_schemas.UserLogin , db: Session = Depends(get_db)):
+@router.post("/login", response_model=user_schemas.Token)
+def login_for_access_token(form_data:user_schemas.UserLogin , db: Session = Depends(database.get_db)):
     user = authenticate_user(db, form_data.email, form_data.password)
     if not user:
         raise HTTPException(

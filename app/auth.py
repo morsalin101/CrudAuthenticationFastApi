@@ -1,14 +1,14 @@
 from passlib.context import CryptContext
 import os
-from datetime import datetime, timedelta,timezone
+from datetime import datetime, timedelta, timezone
 from typing import Union, Any
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 import jwt
-from database import get_db, SessionLocal
+from app.database import get_db, SessionLocal
 from sqlalchemy.orm import Session
-import models
-import schemas.user_schemas
+from app import models
+from app.schemas.user_schemas import TokenData  # Import TokenData directly
 from jose import JWTError
 
 
@@ -18,9 +18,7 @@ ALGORITHM = "HS256"
 JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'your_default_secret_key')  # Replace with a strong secret key
 
 
-
 # Function to create an access token
-
 def create_access_token(subject: Union[str, Any], expires_delta: timedelta = None) -> str:
     if expires_delta is not None:
         expire = datetime.now(timezone.utc) + expires_delta
@@ -46,7 +44,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
-        token_data = schemas.user_schemas.TokenData(username=username)
+        token_data = TokenData(username=username)  # Use TokenData directly
     except JWTError:
         raise credentials_exception
     

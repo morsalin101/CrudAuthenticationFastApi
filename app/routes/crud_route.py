@@ -1,10 +1,12 @@
+# app/routes/crud_route.py
+
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
-from models import Post, User
-from database import get_db
-from schemas.post_schemas import PostCreate, PostUpdate  # Assuming PostUpdate is defined
-from auth import get_current_user
+from app.models import Post, User  # Correct import path
+from app.database import get_db
+from app.schemas.post_schemas import PostCreate, PostUpdate  # Assuming PostUpdate is defined
+from app.auth import get_current_user
 
 # Define the HTTPBearer dependency
 security = HTTPBearer()
@@ -13,7 +15,6 @@ router = APIRouter()
 
 @router.get("/all-posts")
 def get_posts(db: Session = Depends(get_db), credentials: HTTPAuthorizationCredentials = Depends(security)):
-    # Use the credentials.token if needed
     posts = db.query(Post).all()
     return posts
 
@@ -24,8 +25,13 @@ def create_post(
     credentials: HTTPAuthorizationCredentials = Depends(security),
     current_user: User = Depends(get_current_user)
 ):
-    # credentials.token gives you the token from the Authorization header
-    db_post = Post(title=post.title, description=post.description, uuid=post.uuid)
+    # Automatically assign the current user's UUID to the post's uuid field
+    db_post = Post(
+        title=post.title,
+        description=post.description,
+        uuid=current_user.uuid  # Use the current user's UUID from the backend
+    )
+    
     db.add(db_post)
     db.commit()
     db.refresh(db_post)
@@ -52,7 +58,7 @@ def update_post(
     db_post.title = post.title
     db_post.description = post.description
     db.commit()
-    db.refresh(db_post)  # Refresh to return the updated object
+    db.refresh(db_post)
     return {"message": "Post updated successfully", "post": db_post}
 
 @router.delete("/delete-post/{post_id}")
