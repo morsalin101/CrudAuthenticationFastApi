@@ -10,8 +10,9 @@ def get_db():
     finally:
         db.close()
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./myapp.db"
-# SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
+#SQLALCHEMY_DATABASE_URL = "sqlite:///./myapp.db"
+SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root@localhost/fastapi"
+
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}

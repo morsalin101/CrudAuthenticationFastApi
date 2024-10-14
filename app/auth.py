@@ -9,6 +9,7 @@ from database import get_db, SessionLocal
 from sqlalchemy.orm import Session
 import models
 import schemas.user_schemas
+from jose import JWTError
 
 
 # Configuration for JWT and Password Hashing
